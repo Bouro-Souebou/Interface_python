@@ -93,3 +93,14 @@ root.mainloop()
 La fonction `read_serial()` est appelée de manière récurrente pour lire les données du port série et mettre à jour l'interface utilisateur. La boucle principale de l'interface utilisateur (`root.mainloop()`) est lancée pour afficher la fenêtre et répondre aux interactions de l'utilisateur.
 
 N'oubliez pas d'adapter le port série (`port`) à votre configuration et de remplir les fonctions vides pour afficher les graphiques et gérer la sauvegarde en CSV en fonction de vos besoins spécifiques.
+
+# serial_bluetooth.ino
+
+Dans ce code Arduino, nous utilisons la bibliothèque SoftwareSerial pour établir une communication série avec le module Bluetooth. Assurez-vous de connecter correctement les broches RX et TX du module Bluetooth à des broches numériques appropriées de votre Arduino et de spécifier les broches correctes dans le code (SoftwareSerial bluetoothSerial(10, 11)).
+
+Le code lit les données du port série (Serial) provenant de l'interface utilisateur Python. Il envoie ensuite ces données à l'autre carte via Bluetooth en utilisant bluetoothSerial.println(command).
+
+Ensuite, le code Arduino reçoit les données de l'autre carte via Bluetooth en utilisant bluetoothSerial.available() et bluetoothSerial.readString(). Ces données peuvent être traitées selon vos besoins.
+
+Finalement, le code envoie les données reçues de l'autre carte au port série (Serial.println(data)) pour les renvoyer à l'interface utilisateur Python.
+Assurez-vous de configurer correctement le module Bluetooth sur l'autre carte (vérifier le nom du module, le débit binaire, etc.) et d'adapter le code Arduino en conséquence.
