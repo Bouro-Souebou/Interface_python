@@ -81,3 +81,92 @@ conda install pyserial
 conda install tk
 conda install matplotlib
 ```
+
+# master_node.ino
+
+Le code est destiné à un nœud maître (master node) qui communique avec un nœud esclave (slave node) à l'aide de la communication série et du Bluetooth. Le nœud maître reçoit des commandes de l'ordinateur intermédiaire via la communication série et les envoie au nœud esclave via le Bluetooth. Il reçoit également des données du nœud esclave et les transmet à l'ordinateur intermédiaire.
+
+Voici une explication détaillée du code :
+
+1. Déclaration et initialisation des variables :
+   - `start` : un booléen indiquant si le nœud maître est prêt à démarrer.
+   - `isRunning` : un booléen indiquant si le nœud maître est en cours d'exécution.
+   - `counter` : un compteur utilisé pour déterminer si le nœud maître doit démarrer l'acquisition de données.
+   - `command` : une chaîne de caractères utilisée pour stocker les commandes reçues.
+   - `timer` : une variable qui enregistre le temps écoulé depuis le début du traitement d'une commande.
+
+2. Fonction `setup()` :
+   - Cette fonction est exécutée une seule fois au démarrage du programme.
+   - Elle initialise les communications série avec le nœud esclave (`Serial1.begin(38400)`) et le Bluetooth (`Serial.begin(115200)`).
+   - Le buffer de communication série du Bluetooth est vidé (`Serial1.flush()`).
+   - La fonction attend une connexion Bluetooth en envoyant périodiquement un message "Ready?" au nœud esclave avec `Serial1.print("Ready?\n")`.
+   - Une fois la connexion établie (`Serial1.available()`), la fonction affiche "connected" et attend une seconde avant de passer à la boucle principale.
+
+3. Boucle principale `loop()` :
+   - Cette boucle s'exécute en boucle indéfiniment après l'exécution de la fonction `setup()`.
+   - Elle vérifie si des données sont disponibles sur le port série (`Serial.available()`).
+   - Si des données sont disponibles, elles sont lues avec `Serial.readStringUntil('\n')` et stockées dans la variable `command`.
+   - En fonction de la commande reçue, différentes actions sont effectuées :
+     - Si la commande commence par "F" et contient les sous-chaînes "G" et "V", elle est traitée comme une commande de modification des paramètres de fréquence, de gain et de tension de référence.
+       - Les nouvelles valeurs sont extraites de la commande.
+       - Les valeurs sont ensuite envoyées au nœud esclave via le Bluetooth avec `Serial1.print()`.
+     - Si la commande est "start", "stop", "pause" ou "continue", elle est envoyée au nœud esclave via le Bluetooth avec `Serial1.print()` pour contrôler l'acquisition de données.
+   - Si des données sont disponibles sur le port série du Bluetooth (`Serial1.available()`), elles sont lues avec `Serial1.readStringUntil('\n')` et stockées dans la variable `data_rec`.
+     - Si la valeur de `data_rec` est "yes", cela signifie que le nœud esclave est prêt à démarrer l'acquisition de données.
+       - Le compteur `counter` est incrémenté et si sa valeur atteint 8, la variable `isRunning` est définie sur `true`.
+     - Si la commande commence par "A" et contient les sous-chaînes "G" et "V", cela signifie que des données ont été reçues du nœud esclave et elles sont affichées.
+     - Sinon, la commande et les données reçues sont envoyées à l'ordinateur intermédiaire via la communication série pour un traitement ultérieur.
+   - Si `isRunning` est `true`, cela signifie que le nœud maître est en cours d'exécution et il envoie le message "ok from master\n" au nœud esclave pour le notifier.
+   - La variable `isRunning` est ensuite définie sur `false` et il y a un délai de 200 ms avant la prochaine itération de la boucle.
+
+Cela résume l'explication du code. Le nœud maître reçoit des commandes de l'ordinateur intermédiaire via la communication série, les transmet au nœud esclave via le Bluetooth et renvoie les données du nœud esclave à l'ordinateur intermédiaire.
+
+# slave_node.ino
+
+Le code est le code du "Slave Node" dans un système de communication à deux nœuds (Master-Slave) utilisant Bluetooth pour interagir avec un autre Arduino (le "Master Node"). Voici une explication détaillée du code :
+
+1. Bibliothèques incluses :
+   - `Adafruit_NAU7802.h` : Bibliothèque pour communiquer avec le convertisseur analogique-numérique (CAN) NAU7802.
+   - `Arduino.h` : Bibliothèque principale d'Arduino.
+   - `Wire.h` : Bibliothèque pour la communication I2C (utilisée par `Adafruit_NAU7802`).
+
+2. Variables globales :
+   - `bool isRunning = false;` : Un indicateur booléen pour indiquer si le processus d'acquisition de données est en cours.
+   - `bool isStarted = true;` : Un indicateur booléen pour indiquer si le processus d'acquisition de données a démarré.
+   - `bool isSendingData = false;` : Un indicateur booléen pour indiquer si les données sont en cours d'envoi.
+   - `int freq = 320;` : La fréquence initiale en Hz pour l'acquisition de données.
+   - `int gain = 32;` : Le gain initial pour le convertisseur NAU7802.
+   - `float vref = 0.122;` : La tension de référence initiale pour le convertisseur NAU7802.
+   - `float LDO = 2.4;` : La tension de l'alimentation du convertisseur NAU7802.
+
+3. Fonction `setup()` :
+   - La communication série avec le PC intermédiaire est initialisée.
+   - La communication série avec le convertisseur NAU7802 est établie.
+   - Le convertisseur NAU7802 est configuré avec les valeurs de tension de l'alimentation, du gain et de la fréquence définies par défaut.
+   - Les valeurs lues du convertisseur NAU7802 sont lues et éliminées pour vider le tampon.
+   - Le calibrage du convertisseur NAU7802 est effectué en fonction des indicateurs `internal`, `gain` et `offset`. S'il échoue, il tente de nouveau le calibrage.
+
+4. 
+  
+
+5. Fonction `loop()` : Lecture des commandes du "Master Node" :
+   - Si des données sont disponibles sur le port série Bluetooth (`Serial1.available()`), la fonction lit la commande envoyée par le "Master Node".
+   - En fonction de la commande reçue, différentes actions sont effectuées :
+     - Si la commande commence par "F" et contient les sous-chaînes "G" et "V", cela signifie qu'elle contient de nouvelles valeurs pour la fréquence, le gain et la tension de référence. Ces valeurs sont extraites de la commande et utilisées pour mettre à jour les paramètres du convertisseur NAU7802.
+     - Si la commande est "start", l'indicateur `isRunning` est défini sur true pour indiquer que le processus d'acquisition de données peut démarrer.
+     - Si la commande est "stop" ou "pause", l'indicateur `isRunning` est défini sur false pour arrêter le processus d'acquisition de données.
+     - Si la commande est "continue", l'indicateur `isRunning` est défini sur true pour reprendre le processus d'acquisition de données.
+     - Si la commande est "Ready?" ou "ok from master", un message de confirmation est envoyé au "Master Node" via la communication Bluetooth.
+
+6. Fonction `ADCconfig()` :
+   - Cette fonction configure le convertisseur NAU7802 en fonction des valeurs de tension de l'alimentation, du gain et de la fréquence spécifiées.
+   - Les valeurs de tension de l'alimentation, du gain et de la fréquence sont sélectionnées à partir des paramètres de la fonction pour configurer le convertisseur NAU7802.
+
+7. Fonction `setCalibration()` :
+   - Cette fonction effectue le calibrage du convertisseur NAU7802 en fonction des indicateurs `internal`, `gain` et `offset`.
+   - S'il est nécessaire de calibrer l'offset, le gain ou les valeurs internes, la fonction tente de calibrer le convertisseur NAU7802 et réessaie s'il échoue.
+
+8. Fonction `readADC()` :
+   - Cette fonction effectue l'acquisition de données à partir du convertisseur NAU7802.
+   - Le nombre d'acquisitions à effectuer est déterminé par la fréquence spécifiée.
+   - Pour chaque acquisition, les données sont lues du convertisseur NAU7802 et envoyées au "Master Node" via la communication Bluetooth.
