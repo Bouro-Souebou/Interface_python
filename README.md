@@ -1,98 +1,77 @@
 # Interface_python
-Bien sûr ! Voici une explication du code fourni :
+Ce code est une application Python qui utilise la bibliothèque Tkinter pour créer une interface utilisateur graphique (GUI). L'application est conçue pour lire des données à partir d'un port série et les afficher dans une zone de texte et sur des graphiques en temps réel.
 
-1. Importation des bibliothèques nécessaires :
-```python
-import serial
-import tkinter as tk
-from tkinter import ttk
-import matplotlib.pyplot as plt
-import csv
-```
-Les bibliothèques importées sont les suivantes :
+Voici une explication des différentes parties du code :
+1. Les importations : Le code commence par importer les bibliothèques nécessaires, telles que:
 - `serial` : Permet la communication avec le port série.
+- `time` pour la gestion du temps.
 - `tkinter` : Fournit les fonctionnalités pour créer une interface utilisateur.
 - `ttk` : Offre des widgets améliorés pour Tkinter.
-- `matplotlib.pyplot` : Utilisée pour afficher les graphiques.
-- `csv` : Permet de travailler avec les fichiers CSV.
-
-2. Définition des variables pour le port série :
+- `matplotlib` pour la création des graphiques.
+- `csv` pour la sauvegarde des données en format CSV.
+  
+2. Définition des variables : Les variables telles que le port série, le débit binaire, la pleine échelle, l'accélération gravitationnelle, la tension de référence, dA et dB sont définies avec leurs valeurs respectives.
 ```python
 port = '/dev/ttyACM0'  # Remplacez par votre port série
-baud_rate = 9600
+baud_rate = 9600 # Vous devez spécifier le port série sur lequel votre Arduino est connecté et le débit binaire correspondant.
 ```
-Vous devez spécifier le port série sur lequel votre Arduino est connecté et le débit binaire correspondant.
+3. Initialisation de la connexion série : La connexion série est établie en utilisant la bibliothèque `serial` et les valeurs du port et du débit binaire définis précédemment.
 
-3. Initialisation de la connexion série :
-```python
-ser = serial.Serial(port, baud_rate)
-```
-Cette ligne crée un objet `Serial` en utilisant le port série et le débit binaire spécifiés.
+4. Création des graphiques : Une figure et trois axes de graphiques sont créés en utilisant `matplotlib`.
 
-4. Définition de la fonction pour envoyer une commande par port série :
-```python
-def send_command(command):
-    ser.write(command.encode())
-```
-Cette fonction prend une commande en tant que paramètre, encode la commande en bytes et l'envoie via le port série.
+5. Définition des lignes des graphiques : Des lignes vides sont créées pour les graphiques à l'aide des axes précédemment définis.
 
-5. Définition de la fonction pour lire les données du port série et afficher le texte :
-```python
-def read_serial():
-    if ser.in_waiting > 0:
-        data = ser.readline().decode('utf-8').rstrip()
-        text_box.insert(tk.END, data + '\n')
-    root.after(100, read_serial)
-```
-Cette fonction est appelée de manière récurrente pour lire les données disponibles sur le port série. Si des données sont disponibles, elles sont lues à l'aide de `ser.readline()`, décodées en utilisant UTF-8 et affichées dans la zone de texte de l'interface utilisateur.
+6. Ajout des étiquettes d'axe : Des étiquettes d'axe sont définies pour les graphiques en utilisant les axes correspondants.
 
-6. Définition de la fonction pour sauvegarder les données en CSV :
-```python
-def save_data_to_csv(data):
-    with open('data.csv', 'a', newline='') as file:
-        writer = csv.writer(file)
-        writer.writerow(data)
-```
-Cette fonction prend des données en tant que paramètre et les ajoute en tant que ligne dans un fichier CSV nommé "data.csv".
+7. Définition des listes pour stocker les données des graphiques : Des listes vides sont créées pour stocker les valeurs de temps, de tension, de force sur la palette et de réaction sur la lame de la palette.
 
-7. Définition des fonctions pour afficher les graphiques :
-```python
-def plot_graph1():
-    # Code pour afficher le premier graphique
-    pass
+8. Fonction pour mettre à jour les graphiques : Cette fonction est utilisée pour ajouter de nouvelles valeurs aux listes de données des graphiques, mettre à jour les lignes des graphiques avec les nouvelles données et redessiner les graphiques.
 
-def plot_graph2():
-    # Code pour afficher le deuxième graphique
-    pass
+9. Fonction pour lire les données du port série : Cette fonction est appelée périodiquement pour lire les données du port série. Si des données sont disponibles, elles sont traitées et affichées dans l'interface utilisateur. Si les données correspondent à des valeurs de temps et d'ADC, la fonction `compute` est appelée pour effectuer des calculs et mettre à jour les graphiques.
 
-def plot_graph3():
-    # Code pour afficher le troisième graphique
-    pass
-```
-Ces fonctions sont appelées lorsque les boutons correspondants sont cliqués. Vous pouvez remplacer les commentaires par votre propre code pour afficher les graphiques souhaités.
+10. Fonction pour effectuer des calculs : Cette fonction prend le temps et la valeur ADC en tant que paramètres, effectue des calculs sur ces valeurs pour obtenir la tension, la force sur la palette et la réaction sur la lame de la palette, puis appelle la fonction `update_graphs` pour mettre à jour les graphiques.
 
-8. Création de l'interface utilisateur :
-```python
-root = tk.Tk()
-root.title('Interface utilisateur')
+11. Fonction pour sauvegarder les données en CSV : Cette fonction est utilisée pour demander à l'utilisateur de spécifier un nom de fichier et enregistrer les données actuelles des graphiques dans un fichier CSV.
 
-text_box = tk.Text(root)
-text_box.pack()
+12. Fonctions pour activer/désactiver les boutons : Ces fonctions sont utilisées pour activer ou désactiver les boutons en fonction des valeurs sélectionnées dans l'interface utilisateur.
 
-# ... Autres widgets (boutons, menus déroulants) ...
+13. Fonction pour envoyer les valeurs : Cette fonction est appelée lorsque le bouton "Envoyer les valeurs" est cliqué. Elle récupère les valeurs sélectionnées dans l'interface utilisateur et les envoie au périphérique connecté via le port série.
 
-root.mainloop()
-```
-Cette partie du code crée une fenêtre principale pour l'interface utilisateur en utilisant Tkinter et définit son titre. La zone de texte est créée pour afficher les données reçues.
+14. Fonction pour convertir les millisecondes en format de temps : Cette fonction est utilisée pour convertir les millisecondes en heures, minutes, secondes et millisecondes, puis formater le temps sous forme d'une chaîne de caractères.
 
-9. Démarrage de la boucle principale de l'interface utilisateur et appel de la fonction de lecture du port série :
-```python
-read_serial()
-root.mainloop()
-```
-La fonction `read_serial()` est appelée de manière récurrente pour lire les données du port série et mettre à jour l'interface utilisateur. La boucle principale de l'interface utilisateur (`root.mainloop()`) est lancée pour afficher la fenêtre et répondre aux interactions de l'utilisateur.
+15. Fonction pour vérifier si une chaîne de caractères peut être convertie en nombre flottant : Cette fonction est utilisée pour vérifier si une chaîne de caractères peut être convertie en nombre flottant. Elle renvoie `True` si la conversion est possible, sinon elle renvoie `False`.
 
-N'oubliez pas d'adapter le port série (`port`) à votre configuration et de remplir les fonctions vides pour afficher les graphiques et gérer la sauvegarde en CSV en fonction de vos besoins spécifiques.
+16. Création de l'interface utilisateur : Une fenêtre principale est créée en utilisant `tkinter`. Elle contient une zone de texte pour afficher les données, des champs de saisie et des boutons pour sélectionner et envoyer des valeurs, des graphiques pour afficher les données en temps réel, des boutons pour contrôler la réception de données, un bouton pour sauvegarder les données en CSV.
+
+17. Lancement de la lecture du port série et de la boucle principale de l'interface utilisateur : La fonction `read_serial` est appelée pour commencer la lecture des données du port série, puis la boucle principale de l'interface utilisateur (`root.mainloop()`) est démarrée pour afficher l'interface et attendre les interactions de l'utilisateur.
+
+Pour installer les dépendances nécessaires et créer un environnement virtuel Python, vous pouvez suivre les étapes suivantes :
+
+1. Assurez-vous que Python est installé sur votre système.
+
+2. Ouvrez un terminal ou une invite de commande.
+
+3. Créez un nouvel environnement virtuel en utilisant la commande suivante :
+   ```
+   python -m venv mon_environnement
+   ```
+   Remplacez "mon_environnement" par le nom que vous souhaitez donner à votre environnement.
+
+4. Activez l'environnement virtuel en utilisant la commande appropriée selon votre système d'exploitation :
+   - Sur Windows :
+     ```
+     mon_environnement\Scripts\activate
+     ```
+   - Sur macOS et Linux :
+     ```
+     source mon_environnement/bin/activate
+     ```
+
+5. Installez les dépendances nécessaires en utilisant la commande suivante :
+   ```
+   pip install pyserial matplotlib
+   ```
+   Cela installera les bibliothèques `pyserial` et `matplotlib` requises par le code.
 
 # serial_bluetooth.ino
 
