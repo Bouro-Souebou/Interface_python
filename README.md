@@ -74,7 +74,11 @@ Voici une explication détaillée du code :
      - Si les données contiennent une réponse ACK, un bouton "start" est activé et les données sont affichées dans l'interface utilisateur.
      - Si les données contiennent des valeurs de temps et de tension, elles sont affichées dans l'interface utilisateur et la fonction `compute()` est appelée pour effectuer des calculs.
      - Sinon, les données sont simplement affichées dans l'interface utilisateur.
-   - La fonction se répète après un délai de 2 ms en utilisant `root.after(2, read_serial)`.
+   - La fonction se répète après un délai de 2 ms en utilisant `root.after(2, read_serial)`. Techniquement, il est possible de répéter la fonction `read_serial()` après un délai de 2 ms en utilisant `root.after(2, read_serial)`. Cependant, il y a une limite pratique à la fréquence d'exécution des tâches dans une application graphique. Les systèmes d'exploitation modernes ont généralement une résolution de minuterie de l'ordre de quelques millisecondes, ce qui signifie qu'une valeur inférieure à cette résolution n'aura pas d'effet significatif et entraînera une surcharge inutile du processeur.
+
+Dans votre cas, un délai de 2 ms est déjà très court, et essayer de le réduire à 0.02 ms ne produira probablement pas de résultats significativement meilleurs. De plus, une telle fréquence d'exécution élevée peut entraîner une utilisation excessive du processeur et affecter les performances globales de l'application.
+
+Il est recommandé de choisir un délai approprié en fonction des besoins de votre application et des performances de votre système. Un délai de quelques millisecondes (par exemple, 10 ms) est généralement suffisant pour une mise à jour fluide des graphiques et une réactivité de l'interface utilisateur. Vous pouvez ajuster le délai en conséquence en utilisant `root.after(delay, read_serial)`.
 
 8. Fonction `compute(time, ADC_value)` :
    - Cette fonction est appelée pour effectuer des calculs à partir des données lues du port série.
