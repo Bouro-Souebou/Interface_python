@@ -1,5 +1,5 @@
 # Interface_python
-Le code que vous avez fourni est une application Python qui implémente une interface utilisateur graphique (GUI) à l'aide de la bibliothèque Tkinter. L'application communique avec un périphérique externe via un port série pour lire et afficher les données reçues, effectuer des calculs et afficher des graphiques en temps réel.
+Ce code est une application Python qui utilise la bibliothèque Tkinter pour créer une interface utilisateur graphique (GUI). L'application est conçue pour lire des données à partir d'un port série et les afficher dans une zone de texte et sur des graphiques. L'interface graphique affiche les données reçues en temps réel dans une zone de texte, et les graphiques se mettent à jour en fonction des nouvelles données reçues. Les boutons permettent de configurer certains paramètres et d'interagir avec l'appareil connecté via le port série.
 
 Voici une explication détaillée du code :
 
