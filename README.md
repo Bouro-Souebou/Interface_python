@@ -1,5 +1,5 @@
 # Interface_python
-Ce code est une application Python qui utilise la bibliothèque Tkinter pour créer une interface utilisateur graphique (GUI). L'application est conçue pour lire des données à partir d'un port série et les afficher dans une zone de texte et sur des graphiques en temps réel.
+Ce code est une application Python qui utilise la bibliothèque Tkinter pour créer une interface utilisateur graphique (GUI). L'application est conçue pour lire des données à partir d'un port série et les afficher dans une zone de texte et sur des graphiques. L'interface graphique affiche les données reçues en temps réel dans une zone de texte, et les graphiques se mettent à jour en fonction des nouvelles données reçues. Les boutons permettent de configurer certains paramètres et d'interagir avec l'appareil connecté via le port série.
 
 Voici une explication des différentes parties du code :
 1. Les importations : Le code commence par importer les bibliothèques nécessaires, telles que:
@@ -7,6 +7,7 @@ Voici une explication des différentes parties du code :
 - `time` pour la gestion du temps.
 - `tkinter` : Fournit les fonctionnalités pour créer une interface utilisateur.
 - `ttk` : Offre des widgets améliorés pour Tkinter.
+- `matplotlib.backends.backend_tkagg.FigureCanvasTkAgg`: Pour intégrer les graphiques dans l'interface Tkinter.
 - `matplotlib` pour la création des graphiques.
 - `csv` pour la sauvegarde des données en format CSV.
   
@@ -47,39 +48,5 @@ baud_rate = 9600 # Vous devez spécifier le port série sur lequel votre Arduino
 
 Pour installer les dépendances nécessaires et créer un environnement virtuel Python, vous pouvez suivre les étapes suivantes :
 
-1. Assurez-vous que Python est installé sur votre système.
 
-2. Ouvrez un terminal ou une invite de commande.
 
-3. Créez un nouvel environnement virtuel en utilisant la commande suivante :
-   ```
-   python -m venv mon_environnement
-   ```
-   Remplacez "mon_environnement" par le nom que vous souhaitez donner à votre environnement.
-
-4. Activez l'environnement virtuel en utilisant la commande appropriée selon votre système d'exploitation :
-   - Sur Windows :
-     ```
-     mon_environnement\Scripts\activate
-     ```
-   - Sur macOS et Linux :
-     ```
-     source mon_environnement/bin/activate
-     ```
-
-5. Installez les dépendances nécessaires en utilisant la commande suivante :
-   ```
-   pip install pyserial matplotlib
-   ```
-   Cela installera les bibliothèques `pyserial` et `matplotlib` requises par le code.
-
-# serial_bluetooth.ino
-
-Dans ce code Arduino, nous utilisons la bibliothèque SoftwareSerial pour établir une communication série avec le module Bluetooth. Assurez-vous de connecter correctement les broches RX et TX du module Bluetooth à des broches numériques appropriées de votre Arduino et de spécifier les broches correctes dans le code (SoftwareSerial bluetoothSerial(10, 11)).
-
-Le code lit les données du port série (Serial) provenant de l'interface utilisateur Python. Il envoie ensuite ces données à l'autre carte via Bluetooth en utilisant bluetoothSerial.println(command).
-
-Ensuite, le code Arduino reçoit les données de l'autre carte via Bluetooth en utilisant bluetoothSerial.available() et bluetoothSerial.readString(). Ces données peuvent être traitées selon vos besoins.
-
-Finalement, le code envoie les données reçues de l'autre carte au port série (Serial.println(data)) pour les renvoyer à l'interface utilisateur Python.
-Assurez-vous de configurer correctement le module Bluetooth sur l'autre carte (vérifier le nom du module, le débit binaire, etc.) et d'adapter le code Arduino en conséquence.
