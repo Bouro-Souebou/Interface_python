@@ -31,7 +31,7 @@ Trois codes : le code Python exécuté sur un PC, le code "Master Node" exécut�
 
 En résumé, le code Python sert d'interface utilisateur et envoie des commandes de contrôle et de configuration au "Master Node". Le "Master Node" agit comme l'intermédiaire entre le PC et le "Slave Node", en recevant les commandes du PC et en les transmettant au "Slave Node" pour effectuer les actions correspondantes. Le "Slave Node" effectue l'acquisition de données à partir du CAN NAU7802 et envoie les données acquises au "Master Node", qui les renvoie ensuite au PC via Bluetooth. Ainsi, les trois codes fonctionnent ensemble pour établir une communication bidirectionnelle et effectuer l'acquisition de données à partir du "Slave Node" vers le PC.
 
-## Interface_python
+## interface.py
 Ce code est une application Python qui utilise la bibliothèque Tkinter pour créer une interface utilisateur graphique (GUI). L'application est conçue pour lire des données à partir d'un port série et les afficher dans une zone de texte et sur des graphiques. L'interface graphique affiche les données reçues en temps réel dans une zone de texte, et les graphiques se mettent à jour en fonction des nouvelles données reçues. Les boutons permettent de configurer certains paramètres et d'interagir avec l'appareil connecté via le port série.
 
 Voici une explication détaillée du code :
