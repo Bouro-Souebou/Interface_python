@@ -1,4 +1,37 @@
-# Interface_python
+# Fonctionnement ensemble :
+Trois codes : le code Python exécuté sur un PC, le code "Master Node" exécuté sur un Arduino et le code "Slave Node" exécuté sur un autre Arduino. Ces trois codes fonctionnent ensemble pour établir une communication bidirectionnelle entre le PC et les Arduinos via Bluetooth. Voici une explication détaillée de leur fonctionnement ensemble :
+
+1. Code Python (Exécuté sur un PC) :
+   - Le code Python est responsable de l'établissement de la communication Bluetooth avec les Arduinos et de l'envoi/reception des commandes et des données.
+   - Il utilise une bibliothèque Python telle que `pyserial` pour communiquer avec le port série Bluetooth du PC.
+   - La communication entre le PC et les Arduinos est réalisée via des commandes et des réponses sous forme de chaînes de caractères.
+   - Le code Python peut envoyer des commandes de contrôle (par exemple, "start", "stop", "pause", "continue") au "Master Node" pour démarrer, arrêter ou mettre en pause l'acquisition de données.
+   - Le code Python peut également envoyer des commandes de configuration (par exemple, "F200 G32 V0.5") pour modifier les paramètres du "Master Node" tels que la fréquence, le gain et la tension de référence.
+   - Le "Slave Node" envoie des données acquises au "Master Node" sous forme de chaînes de caractères (par exemple, "0;12345;67890\n" où "0" est l'index de l'échantillon, "12345" est le temps de l'échantillon, et "67890" est la valeur de l'échantillon).
+
+2. Code "Master Node" (Exécuté sur un Arduino) :
+   - Le "Master Node" est le code exécuté sur un Arduino qui agit comme le nœud principal de l'ensemble du système.
+   - Il est responsable de la communication Bluetooth avec le PC et la communication série avec le "Slave Node".
+   - Le "Master Node" utilise la communication série (`Serial`) pour envoyer des commandes au "Slave Node" et recevoir des données acquises de celui-ci.
+   - Il utilise la communication Bluetooth (`Serial1`) pour recevoir des commandes du PC et envoyer les réponses correspondantes.
+   - Le "Master Node" analyse les commandes reçues du PC et effectue les actions appropriées :
+     - Si une commande de configuration (par exemple, "F200 G32 V0.5") est reçue, le "Master Node" extrait les nouvelles valeurs de fréquence, gain et tension de référence, puis les envoie au "Slave Node" via la communication série.
+     - Si une commande de contrôle (par exemple, "start", "stop", "pause", "continue") est reçue, le "Master Node" effectue l'action correspondante en démarrant, arrêtant ou mettant en pause l'acquisition de données.
+   - Le "Master Node" reçoit les données acquises du "Slave Node" via la communication série et les envoie au PC via la communication Bluetooth.
+
+3. Code "Slave Node" (Exécuté sur un autre Arduino) :
+   - Le "Slave Node" est le code exécuté sur un autre Arduino qui agit comme un nœud esclave du système.
+   - Il est responsable de la communication série avec le "Master Node" et l'acquisition de données à partir du convertisseur analogique-numérique (CAN) NAU7802.
+   - Le "Slave Node" utilise la communication série (`Serial`) pour recevoir des commandes du "Master Node" et envoyer des données acquises à celui-ci.
+   - Il utilise également le CAN NAU7802 pour effectuer l'acquisition de données à une fréquence spécifiée.
+   - Le "Slave Node" lit les commandes reçues du "Master Node" et effectue les actions correspondantes :
+     - Si une commande de configuration (par exemple, "F200 G32 V0.5") est reçue, le "Slave Node" extrait les nouvelles valeurs de fréquence, gain et tension de référence, puis met à jour la configuration du CAN NAU7802.
+     - Si une commande de contrôle (par exemple, "start", "stop", "pause", "continue") est reçue, le "Slave Node" démarre, arrête ou met en pause l'acquisition de données en fonction de la commande.
+   - Le "Slave Node" effectue l'acquisition de données à la fréquence spécifiée à l'aide du CAN NAU7802, puis envoie les données acquises au "Master Node" via la communication série.
+
+En résumé, le code Python sert d'interface utilisateur et envoie des commandes de contrôle et de configuration au "Master Node". Le "Master Node" agit comme l'intermédiaire entre le PC et le "Slave Node", en recevant les commandes du PC et en les transmettant au "Slave Node" pour effectuer les actions correspondantes. Le "Slave Node" effectue l'acquisition de données à partir du CAN NAU7802 et envoie les données acquises au "Master Node", qui les renvoie ensuite au PC via Bluetooth. Ainsi, les trois codes fonctionnent ensemble pour établir une communication bidirectionnelle et effectuer l'acquisition de données à partir du "Slave Node" vers le PC.
+
+## Interface_python
 Ce code est une application Python qui utilise la bibliothèque Tkinter pour créer une interface utilisateur graphique (GUI). L'application est conçue pour lire des données à partir d'un port série et les afficher dans une zone de texte et sur des graphiques. L'interface graphique affiche les données reçues en temps réel dans une zone de texte, et les graphiques se mettent à jour en fonction des nouvelles données reçues. Les boutons permettent de configurer certains paramètres et d'interagir avec l'appareil connecté via le port série.
 
 Voici une explication détaillée du code :
@@ -82,7 +115,7 @@ conda install tk
 conda install matplotlib
 ```
 
-# master_node.ino
+## master_node.ino
 
 Le code est destiné à un nœud maître (master node) qui communique avec un nœud esclave (slave node) à l'aide de la communication série et du Bluetooth. Le nœud maître reçoit des commandes de l'ordinateur intermédiaire via la communication série et les envoie au nœud esclave via le Bluetooth. Il reçoit également des données du nœud esclave et les transmet à l'ordinateur intermédiaire.
 
@@ -121,7 +154,7 @@ Voici une explication détaillée du code :
 
 Cela résume l'explication du code. Le nœud maître reçoit des commandes de l'ordinateur intermédiaire via la communication série, les transmet au nœud esclave via le Bluetooth et renvoie les données du nœud esclave à l'ordinateur intermédiaire.
 
-# slave_node.ino
+## slave_node.ino
 
 Le code est le code du "Slave Node" dans un système de communication à deux nœuds (Master-Slave) utilisant Bluetooth pour interagir avec un autre Arduino (le "Master Node"). Voici une explication détaillée du code :
 
